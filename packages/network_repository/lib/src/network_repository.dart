@@ -1,13 +1,17 @@
 /// {@template network_repository}
 /// The interface and models for network-related such as URLs
 /// {@endtemplate}
+
+/********************************************************* 
+Repository to handle network-related constants
+2026-01-03 (Taufiq): Updated project url
+***********************************************************/
 class NetworkRepository {
   /// {@macro network_repository}
   const NetworkRepository();
 
   /// the main url
-  static const mainURL =
-      'https://0d46-2001-e68-5454-778d-9c88-7163-64d8-4870.ngrok-free.app';
+  static const mainURL = 'https://2fea2c9e57ec.ngrok-free.app';
 
   /// the api url
   static const apiURL = '$mainURL/api';
@@ -22,7 +26,7 @@ class NetworkRepository {
   static const userURL = '$apiURL/user';
 
   /// the project url
-  static const projectURL = '$apiURL/project';
+  static const projectURL = '$apiURL/projects';
 
   /// the status url
   static const statusURL = '$apiURL/status';

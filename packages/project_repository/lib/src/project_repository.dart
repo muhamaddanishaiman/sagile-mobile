@@ -5,6 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:network_repository/network_repository.dart';
 import 'package:project_repository/src/models/models.dart';
 
+/********************************************************* 
+Repository to handle project-related requests
+2026-01-03 (Taufiq): Added Some debug prints to trace issues, temp resolve to empty list [] for tasks and projects - debugging purpose
+***********************************************************/
+
 enum ProjectStatus {
   error,
   uninitialized,
@@ -28,6 +33,7 @@ class ProjectRepository {
     try {
       final res = await requestGetProject(token: token);
       final json = jsonDecode(res.body) as Map<String, dynamic>;
+      print("Parsed JSON: $json");
       final success = json['success'] as bool;
       if (success) {
         final projects = <Project>[];
@@ -154,7 +160,7 @@ class ProjectRepository {
       final projectJsonObject = json['data'] as Map<String, dynamic>;
 
       final statuses = <Status>[];
-      final statusesList = projectJsonObject['statuses'] as List;
+      final statusesList = projectJsonObject['statuses'] as List? ?? [];
       if (statusesList.isNotEmpty) {
         for (final statusJsonString in statusesList) {
           final statusJsonObject = statusJsonString as Map<String, dynamic>;
@@ -267,7 +273,7 @@ class ProjectRepository {
         );
 
         final tasks = <Task>[];
-        final tasksList = userstoryJsonObject['tasks'] as List;
+        final tasksList = userstoryJsonObject['tasks'] as List? ?? [];
         if (tasksList.isNotEmpty) {
           for (final taskJsonString in tasksList) {
             final taskJsonObject = taskJsonString as Map<String, dynamic>;

@@ -50,6 +50,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       // when projects of the user is being queried
       case ProjectStatus.retrieving:
         projects = await _tryGetProject(_authenticationRepository.token);
+        print(projects.toString());
         return emit(
           projects != null
               ? ProjectState.ready(projects)
@@ -131,8 +132,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Future<List<Project>?> _tryGetProject(String token) async {
     try {
       final projects = await _projectRepository.getProject(token);
+      print("Project is : $projects");
       return projects;
-    } catch (_) {
+    } catch (error) {
+      print(error.toString());
       return null;
     }
   }
