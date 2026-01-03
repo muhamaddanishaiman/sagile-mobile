@@ -43,7 +43,7 @@ class ProjectRepository {
           final projectJsonObject = projectJsonString as Map<String, dynamic>;
 
           final statuses = <Status>[];
-          final statusesList = projectJsonObject['statuses'] as List;
+          final statusesList = projectJsonObject['statuses'] as List? ?? [];
           if (statusesList.isNotEmpty) {
             for (final statusJsonString in statusesList) {
               final statusJsonObject = statusJsonString as Map<String, dynamic>;
@@ -61,14 +61,15 @@ class ProjectRepository {
           }
 
           final userstories = <Userstory>[];
-          final userstoriesList = projectJsonObject['userstories'] as List;
+          final userstoriesList =
+              projectJsonObject['userstories'] as List? ?? [];
           if (userstoriesList.isNotEmpty) {
             for (final userstoryJsonString in userstoriesList) {
               final userstoryJsonObject =
                   userstoryJsonString as Map<String, dynamic>;
 
               final tasks = <Task>[];
-              final tasksList = userstoryJsonString['tasks'] as List;
+              final tasksList = userstoryJsonObject['tasks'] as List? ?? [];
               if (tasksList.isNotEmpty) {
                 for (final taskJsonString in tasksList) {
                   final taskJsonObject = taskJsonString as Map<String, dynamic>;
@@ -117,13 +118,17 @@ class ProjectRepository {
 
           final project = Project(
             int.parse(projectJsonObject['id']!.toString()),
-            title: projectJsonObject['title']!.toString(),
-            description: projectJsonObject['description']!.toString(),
-            startDate:
-                DateTime.tryParse(projectJsonObject['start_date']!.toString()),
-            endDate:
-                DateTime.tryParse(projectJsonObject['end_date']!.toString()),
-            team: projectJsonObject['team']!.toString(),
+            title: projectJsonObject['title']?.toString() ??
+                projectJsonObject['name']?.toString() ??
+                'Untitled',
+            description: projectJsonObject['description']?.toString() ?? '',
+            startDate: projectJsonObject['start_date'] != null
+                ? DateTime.tryParse(projectJsonObject['start_date']!.toString())
+                : null,
+            endDate: projectJsonObject['end_date'] != null
+                ? DateTime.tryParse(projectJsonObject['end_date']!.toString())
+                : null,
+            team: projectJsonObject['team']?.toString() ?? '',
             statuses: statuses,
             userstories: userstories,
           );
