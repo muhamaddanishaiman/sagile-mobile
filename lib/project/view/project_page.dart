@@ -75,10 +75,11 @@ class _ProjectPageState extends State<ProjectPage> {
                                             ),
                                           ),
                                           onPressed: () {
+                                            // Open project details
                                             showDialog(
                                               context: context,
                                               builder: (context) =>
-                                                  ProjectModalEdit(
+                                                  ProjectModal(
                                                 projectId: e.id,
                                               ),
                                             );
@@ -96,6 +97,14 @@ class _ProjectPageState extends State<ProjectPage> {
                                                 ),
                                               ),
                                             ),
+                                            subtitle: Text(
+                                              e.description.isNotEmpty 
+                                                ? e.description 
+                                                : "No description",
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                                           ),
                                         ),
                                       ),

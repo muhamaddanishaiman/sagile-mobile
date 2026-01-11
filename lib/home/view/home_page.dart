@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:project_repository/project_repository.dart';
 import 'package:sagile_mobile/authentication/authentication.dart';
 import 'package:sagile_mobile/home/view/custom_widgets.dart';
+import 'package:sagile_mobile/project/bloc/project_bloc.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   static Route<void> route() {
     return MaterialPageRoute<void>(builder: (_) => const HomePage());
+  }
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    context.read<ProjectBloc>().add(ProjectStatusChanged(ProjectStatus.loading));
+    context.read<ProjectBloc>().add(ProjectStatusChanged(ProjectStatus.retrieving));
+    super.initState();
   }
 
   @override
@@ -31,92 +45,60 @@ class HomePage extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 32.0),
                           child: Divider(),
                         ),
-                        ListTile(
-                          leading: Container(
-                            width: 48,
-                            height: 48,
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            alignment: Alignment.center,
-                            child: const Icon(Icons.numbers),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            "My Tasks",
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
-                          title: Builder(
-                            builder: (context) {
-                              final userid = context.select(
-                                (AuthenticationBloc bloc) => bloc.state.user.id,
-                              );
-                              return Text('$userid');
-                            },
-                          ),
-                          dense: false,
                         ),
-                        ListTile(
-                          leading: Container(
-                            width: 48,
-                            height: 48,
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            alignment: Alignment.center,
-                            child: const Icon(Icons.account_circle),
-                          ),
-                          // title: Text('username'),
-                          title: Builder(
-                            builder: (context) {
-                              final name = context.select(
-                                (AuthenticationBloc bloc) =>
-                                    bloc.state.user.name,
-                              );
-                              return Text('$name');
-                            },
-                          ),
-                          dense: false,
-                        ),
-                        ListTile(
-                          leading: Container(
-                            width: 48,
-                            height: 48,
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            alignment: Alignment.center,
-                            child: const Icon(Icons.email),
-                          ),
-                          title: Builder(
-                            builder: (context) {
-                              final email = context.select(
-                                (AuthenticationBloc bloc) =>
-                                    bloc.state.user.email,
-                              );
-                              return Text('$email');
-                            },
-                          ),
-                          dense: false,
-                        ),
-                        ListTile(
-                          leading: Container(
-                            width: 48,
-                            height: 48,
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            alignment: Alignment.center,
-                            child: const Icon(Icons.password),
-                          ),
-                          title: Builder(
-                            builder: (context) {
-                              final username = context.select(
-                                (AuthenticationBloc bloc) =>
-                                    bloc.state.user.username,
-                              );
-                              return Text('$username');
-                            },
-                          ),
-                          dense: false,
-                        ),
-                        ListTile(
-                          title: ElevatedButton(
-                            child: const Text('Logout'),
-                            onPressed: () {
-                              context
-                                  .read<AuthenticationBloc>()
-                                  .add(AuthenticationLogoutRequested());
-                            },
-                          ),
-                          dense: false,
+                        BlocBuilder<ProjectBloc, ProjectState>(
+                          builder: (context, state) {
+                            switch (state.status) {
+                              case ProjectStatus.loading:
+                                return const Center(child: CircularProgressIndicator());
+                              case ProjectStatus.ready:
+                                if (state.projects.isEmpty) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Text("No projects found."),
+                                  );
+                                }
+                                final allTasks = state.projects
+                                    .expand((p) => p.userstories)
+                                    .expand((u) => u.tasks)
+                                    .toList();
+                                
+                                if (allTasks.isEmpty) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Text("No tasks assigned."),
+                                  );
+                                }
+
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const ClampingScrollPhysics(),
+                                  itemCount: allTasks.length > 5 ? 5 : allTasks.length,
+                                  itemBuilder: (context, index) {
+                                    final task = allTasks[index];
+                                    return ListTile(
+                                      title: Text(task.title),
+                                      subtitle: Text(task.status.title),
+                                      trailing: Text(
+                                        task.endDate != null 
+                                          ? "${task.endDate!.day}/${task.endDate!.month}/${task.endDate!.year}"
+                                          : "-"
+                                      ),
+                                    );
+                                  },
+                                );
+                              case ProjectStatus.error:
+                                return const Center(child: Text("Failed to load tasks"));
+                              default:
+                                return const SizedBox();
+                            }
+                          },
                         ),
                       ],
                     ),

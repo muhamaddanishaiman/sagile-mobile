@@ -47,7 +47,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               alignment: Alignment.center,
                               child: const Icon(Icons.numbers),
                             ),
-                            title: Builder(
+                            title: const Text("User ID"),
+                            subtitle: Builder(
                               builder: (context) {
                                 final id = context.select(
                                   (AuthenticationBloc bloc) =>
@@ -67,7 +68,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               alignment: Alignment.center,
                               child: const Icon(Icons.account_circle),
                             ),
-                            title: Builder(
+                            title: const Text("Username"),
+                            subtitle: Builder(
                               builder: (context) {
                                 final username = context.select(
                                   (AuthenticationBloc bloc) =>
@@ -87,7 +89,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               alignment: Alignment.center,
                               child: const Icon(Icons.email),
                             ),
-                            title: Builder(
+                            title: const Text("Email"),
+                            subtitle: Builder(
                               builder: (context) {
                                 final email = context.select(
                                   (AuthenticationBloc bloc) =>
@@ -105,9 +108,10 @@ class _SettingsPageState extends State<SettingsPage> {
                               padding:
                                   const EdgeInsets.symmetric(vertical: 4.0),
                               alignment: Alignment.center,
-                              child: const Icon(Icons.account_circle_outlined),
+                              child: const Icon(Icons.badge),
                             ),
-                            title: Builder(
+                            title: const Text("Name"),
+                            subtitle: Builder(
                               builder: (context) {
                                 final name = context.select(
                                   (AuthenticationBloc bloc) =>

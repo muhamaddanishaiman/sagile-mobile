@@ -40,99 +40,92 @@ class ProjectRepository {
         final data = json['data'] as List;
 
         for (final projectJsonString in data) {
-          final projectJsonObject = projectJsonString as Map<String, dynamic>;
+          try {
+            final projectJsonObject = projectJsonString as Map<String, dynamic>;
 
-          final statuses = <Status>[];
-          final statusesList = projectJsonObject['statuses'] as List? ?? [];
-          if (statusesList.isNotEmpty) {
-            for (final statusJsonString in statusesList) {
-              final statusJsonObject = statusJsonString as Map<String, dynamic>;
-              final status = Status(
-                int.parse(
-                  statusJsonObject['id']!.toString(),
-                ),
-                order: int.parse(
-                  statusJsonObject['order']!.toString(),
-                ),
-                title: statusJsonObject['title']!.toString(),
-              );
-              statuses.add(status);
-            }
-          }
-
-          final userstories = <Userstory>[];
-          final userstoriesList =
-              projectJsonObject['userstories'] as List? ?? [];
-          if (userstoriesList.isNotEmpty) {
-            for (final userstoryJsonString in userstoriesList) {
-              final userstoryJsonObject =
-                  userstoryJsonString as Map<String, dynamic>;
-
-              final tasks = <Task>[];
-              final tasksList = userstoryJsonObject['tasks'] as List? ?? [];
-              if (tasksList.isNotEmpty) {
-                for (final taskJsonString in tasksList) {
-                  final taskJsonObject = taskJsonString as Map<String, dynamic>;
-                  final task = Task(
-                    int.parse(
-                      taskJsonObject['id']!.toString(),
-                    ),
-                    order: int.parse(
-                      taskJsonObject['order']!.toString(),
-                    ),
-                    title: taskJsonObject['title']!.toString(),
-                    status: statuses.firstWhere(
-                      (status) =>
-                          status.id ==
-                          int.parse(taskJsonObject['status_id']!.toString()),
-                      orElse: () => Status.empty,
-                    ),
-                    startDate: DateTime.tryParse(
-                      taskJsonObject['start_date']!.toString(),
-                    ),
-                    endDate: DateTime.tryParse(
-                      taskJsonObject['end_date']!.toString(),
-                    ),
-                  );
-
-                  tasks.add(task);
-                }
+            final statuses = <Status>[];
+            final statusesList = projectJsonObject['statuses'] as List? ?? [];
+            if (statusesList.isNotEmpty) {
+              for (final statusJsonString in statusesList) {
+                final statusJsonObject = statusJsonString as Map<String, dynamic>;
+                final status = Status(
+                  int.tryParse(statusJsonObject['id']?.toString() ?? '0') ?? 0,
+                  order: int.tryParse(statusJsonObject['order']?.toString() ?? '0') ?? 0,
+                  title: statusJsonObject['title']?.toString() ?? '',
+                );
+                statuses.add(status);
               }
-
-              final userstory = Userstory(
-                int.parse(
-                  userstoryJsonObject['u_id']!.toString(),
-                ),
-                title: userstoryJsonObject['user_story']!.toString(),
-                status: statuses.firstWhere(
-                  (status) =>
-                      status.id ==
-                      int.parse(userstoryJsonObject['status_id']!.toString()),
-                  orElse: () => Status.empty,
-                ),
-                tasks: tasks,
-              );
-              userstories.add(userstory);
             }
-          }
 
-          final project = Project(
-            int.parse(projectJsonObject['id']!.toString()),
-            title: projectJsonObject['title']?.toString() ??
-                projectJsonObject['name']?.toString() ??
-                'Untitled',
-            description: projectJsonObject['description']?.toString() ?? '',
-            startDate: projectJsonObject['start_date'] != null
-                ? DateTime.tryParse(projectJsonObject['start_date']!.toString())
-                : null,
-            endDate: projectJsonObject['end_date'] != null
-                ? DateTime.tryParse(projectJsonObject['end_date']!.toString())
-                : null,
-            team: projectJsonObject['team']?.toString() ?? '',
-            statuses: statuses,
-            userstories: userstories,
-          );
-          projects.add(project);
+            final userstories = <Userstory>[];
+            final userstoriesList =
+                projectJsonObject['userstories'] as List? ?? [];
+            if (userstoriesList.isNotEmpty) {
+              for (final userstoryJsonString in userstoriesList) {
+                final userstoryJsonObject =
+                    userstoryJsonString as Map<String, dynamic>;
+
+                final tasks = <Task>[];
+                final tasksList = userstoryJsonObject['tasks'] as List? ?? [];
+                if (tasksList.isNotEmpty) {
+                  for (final taskJsonString in tasksList) {
+                    final taskJsonObject = taskJsonString as Map<String, dynamic>;
+                    
+                    final statusId = int.tryParse(taskJsonObject['status_id']?.toString() ?? '0') ?? 0;
+                    
+                    final task = Task(
+                      int.tryParse(taskJsonObject['id']?.toString() ?? '0') ?? 0,
+                      order: int.tryParse(taskJsonObject['order']?.toString() ?? '0') ?? 0,
+                      title: taskJsonObject['title']?.toString() ?? 'Untitled Task',
+                      status: statuses.firstWhere(
+                        (status) => status.id == statusId,
+                        orElse: () => Status.empty,
+                      ),
+                      startDate: DateTime.tryParse(
+                        taskJsonObject['start_date']?.toString() ?? '',
+                      ),
+                      endDate: DateTime.tryParse(
+                        taskJsonObject['end_date']?.toString() ?? '',
+                      ),
+                    );
+
+                    tasks.add(task);
+                  }
+                }
+
+                final statusId = int.tryParse(userstoryJsonObject['status_id']?.toString() ?? '0') ?? 0;
+
+                final userstory = Userstory(
+                  int.tryParse(userstoryJsonObject['u_id']?.toString() ?? '') ?? 
+                  int.tryParse(userstoryJsonObject['id']?.toString() ?? '0') ?? 0,
+                  title: userstoryJsonObject['title']?.toString() ?? 
+                         userstoryJsonObject['user_story']?.toString() ?? 'Untitled Story',
+                  status: statuses.firstWhere(
+                    (status) => status.id == statusId,
+                    orElse: () => Status.empty,
+                  ),
+                  tasks: tasks,
+                );
+                userstories.add(userstory);
+              }
+            }
+
+            final project = Project(
+              int.tryParse(projectJsonObject['id']?.toString() ?? '0') ?? 0,
+              title: projectJsonObject['title']?.toString() ??
+                  projectJsonObject['name']?.toString() ??
+                  'Untitled',
+              description: projectJsonObject['description']?.toString() ?? '',
+              startDate: DateTime.tryParse(projectJsonObject['start_date']?.toString() ?? ''),
+              endDate: DateTime.tryParse(projectJsonObject['end_date']?.toString() ?? ''),
+              team: projectJsonObject['team']?.toString() ?? '',
+              statuses: statuses,
+              userstories: userstories,
+            );
+            projects.add(project);
+          } catch (e) {
+            print("Error parsing project: $e");
+          }
         }
         _controller.add(ProjectStatus.ready);
         return projects;

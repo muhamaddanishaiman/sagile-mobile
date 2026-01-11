@@ -18,16 +18,33 @@ class UserRepository {
       print("Requesting user");
       try {
         final res = await requestUser(token: token);
-        final json = jsonDecode(res.body) as Map<String, dynamic>;
-        final data = json['data'] as Map<String, dynamic>;
-        final user = data['user'] as Map<String, dynamic>;
+        print("User Response: ${res.body}");
+        final json = jsonDecode(res.body);
+        Map<String, dynamic> user;
 
-        final id = user['id'].toString();
-        final name = user['name'].toString();
-        final username = user['username'].toString();
-        final email = user['email'].toString();
+        if (json is Map<String, dynamic> && json.containsKey('data')) {
+           final data = json['data'];
+           if (data is Map<String, dynamic> && data.containsKey('user')) {
+             user = data['user'];
+           } else if (data is Map<String, dynamic>) {
+             user = data;
+           } else {
+             user = {};
+           }
+        } else if (json is Map<String, dynamic>) {
+           user = json; // Direct user object
+        } else {
+           user = {};
+        }
 
-        _user = User(id, name: name, username: username, email: email);
+        final id = user['id']?.toString() ?? '';
+        final name = user['name']?.toString() ?? '';
+        final username = user['username']?.toString() ?? '';
+        final email = user['email']?.toString() ?? '';
+
+        if (id.isNotEmpty) {
+          _user = User(id, name: name, username: username, email: email);
+        }
       } catch (error) {
         print("Error retrieving user: ${error.toString()}");
       }

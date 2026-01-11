@@ -34,21 +34,14 @@ class _ProjectModalState extends State<ProjectModal> {
               children: [
                 Text('Description: ${project.description}'),
                 Text('Team: ${project.team}'),
+                const SizedBox(height: 8),
+                Text('Start Date: ${project.startDate != null ? DateFormat('dd/MM/yyyy').format(project.startDate!) : "-"}'),
+                Text('End Date: ${project.endDate != null ? DateFormat('dd/MM/yyyy').format(project.endDate!) : "-"}'),
               ],
             ),
           ),
           actions: [
-            ElevatedButton(
-              onPressed: () {
-                _navigator.push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ProjectModalEdit(projectId: widget.projectId),
-                  ),
-                );
-              },
-              child: Text("Edit"),
-            ),
+            // Edit button removed for view-only mode
             ElevatedButton(
               onPressed: () {
                 _navigator.pop();
@@ -62,6 +55,8 @@ class _ProjectModalState extends State<ProjectModal> {
   }
 }
 
+// View Only Mode - Edit classes commented out
+/*
 class ProjectModalEdit extends StatefulWidget {
   const ProjectModalEdit({
     super.key,
@@ -615,3 +610,4 @@ class _ProjectModalStatusDeleteState extends State<ProjectModalStatusDelete> {
     );
   }
 }
+*/

@@ -93,53 +93,65 @@ class _CalendarPageState extends State<CalendarPage> {
                       print('');
 
                       final startDates = tasks
-                          .map(
-                            (task) => (task.startDate),
-                          )
+                          .map((task) => task.startDate)
+                          .where((date) => date != null)
                           .toSet();
 
-                      final startEvents = startDates
-                          .map((date) => ({
-                                date!.toUtc(): tasks
-                                    .where((task) => task.startDate! == date)
-                                    .map((task) => ({
-                                          'label': 'startDate',
-                                          'status': task.status.title,
-                                          'title': task.title,
-                                          'startDate': task.startDate,
-                                          'endDate': task.endDate,
-                                        }))
-                                    .toList()
-                              }))
-                          .toSet()
-                          .reduce((value, element) => {...value, ...element});
+                      final startEvents = startDates.map((date) {
+                        return {
+                          date!.toUtc(): tasks
+                              .where((task) =>
+                                  task.startDate != null &&
+                                  task.startDate == date)
+                              .map((task) => ({
+                                    'label': 'startDate',
+                                    'status': task.status.title,
+                                    'title': task.title,
+                                    'startDate': task.startDate,
+                                    'endDate': task.endDate,
+                                  }))
+                              .toList()
+                        };
+                      }).toSet();
 
                       final endDates = tasks
-                          .map(
-                            (task) => (task.endDate),
-                          )
+                          .map((task) => task.endDate)
+                          .where((date) => date != null)
                           .toSet();
 
-                      final endEvents = endDates
-                          .map((date) => ({
-                                date!.toUtc(): tasks
-                                    .where((task) => task.endDate! == date)
-                                    .map((task) => ({
-                                          'label': 'endDate',
-                                          'status': task.status.title,
-                                          'title': task.title,
-                                          'startDate': task.startDate,
-                                          'endDate': task.endDate,
-                                        }))
-                                    .toList()
-                              }))
-                          .toSet()
-                          .reduce((value, element) => {...value, ...element});
+                      final endEvents = endDates.map((date) {
+                        return {
+                          date!.toUtc(): tasks
+                              .where((task) =>
+                                  task.endDate != null && task.endDate == date)
+                              .map((task) => ({
+                                    'label': 'endDate',
+                                    'status': task.status.title,
+                                    'title': task.title,
+                                    'startDate': task.startDate,
+                                    'endDate': task.endDate,
+                                  }))
+                              .toList()
+                        };
+                      }).toSet();
+                      
+                      Map<DateTime, List<dynamic>> events = {};
+                      if (startEvents.isNotEmpty) {
+                         events.addAll(startEvents.reduce((value, element) => {...value, ...element}));
+                      }
+                      if (endEvents.isNotEmpty) {
+                         final endMap = endEvents.reduce((value, element) => {...value, ...element});
+                         // Merge maps carefully
+                         endMap.forEach((key, value) {
+                           if (events.containsKey(key)) {
+                             events[key]!.addAll(value);
+                           } else {
+                             events[key] = value;
+                           }
+                         });
+                      }
 
-                      final events = {...startEvents, ...endEvents};
-                      print('events');
-                      print(events);
-                      print('');
+                      print('events count: ${events.length}');
 
                       switch (state.status) {
                         case ProjectStatus.loading:

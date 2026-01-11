@@ -264,23 +264,7 @@ class _UserstoryPageState extends State<UserstoryPage> {
                                                   // ),
                                                 )
                                                 .toList(),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(16.0),
-                                              child: ElevatedButton(
-                                                  onPressed: () {
-                                                    _navigator.push(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            UserstoryModalNew(
-                                                                projectId:
-                                                                    project.id),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child:
-                                                      Text('Add User Story')),
-                                            )
+                                            // Add User Story button removed for view-only mode
                                           ],
                                         ),
                                       ),
