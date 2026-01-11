@@ -406,6 +406,33 @@ class ProjectRepository {
     );
   }
 
+  Future<Map<String, dynamic>?> getBurndownData({
+    required String token,
+    required int projectId,
+  }) async {
+    try {
+      final url = '${NetworkRepository.projectURL}/$projectId/burndown';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'ngrok-skip-browser-warning': '69420',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        if (json['status'] == 'success') {
+          return json['data'] as Map<String, dynamic>;
+        }
+      }
+    } catch (e) {
+      print("Error fetching burndown data: $e");
+    }
+    return null;
+  }
+
   void clearCache() {
     _controller.add(ProjectStatus.uninitialized);
   }

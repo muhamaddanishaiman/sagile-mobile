@@ -21,5 +21,6 @@ dependencies:
   table_calendar: ^3.0.9
   salomon_bottom_bar: ^3.3.2
   intl: ^0.18.1
+  fl_chart: ^1.1.1
 flutter:
   uses-material-design: true

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:project_repository/project_repository.dart';
 import 'package:sagile_mobile/project/bloc/project_bloc.dart';
+import 'package:sagile_mobile/burndown/burndown.dart';
 
 class ProjectModal extends StatefulWidget {
   const ProjectModal({
@@ -42,6 +43,16 @@ class _ProjectModalState extends State<ProjectModal> {
           ),
           actions: [
             // Edit button removed for view-only mode
+            ElevatedButton(
+              onPressed: () {
+                _navigator.push(
+                  MaterialPageRoute(
+                    builder: (context) => BurndownPage(projectId: project.id),
+                  ),
+                );
+              },
+              child: Text("View Burndown Chart"),
+            ),
             ElevatedButton(
               onPressed: () {
                 _navigator.pop();
