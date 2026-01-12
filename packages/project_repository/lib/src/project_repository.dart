@@ -433,6 +433,86 @@ class ProjectRepository {
     return null;
   }
 
+  Future<List<TeamMember>?> getTeamMembers({
+    required String token,
+    required int projectId,
+  }) async {
+    try {
+      final url = NetworkRepository.teamMembersURL.replaceAll('{id}', projectId.toString());
+      final response = await http.get(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'ngrok-skip-browser-warning': '69420',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        if (json['success'] == true) {
+          final data = json['data'] as List;
+          return data.map((e) {
+            final map = e as Map<String, dynamic>;
+            return TeamMember(
+              id: int.tryParse(map['id']?.toString() ?? '0') ?? 0,
+              name: map['name']?.toString() ?? '',
+              email: map['email']?.toString() ?? '',
+              role: map['role']?.toString() ?? '',
+            );
+          }).toList();
+        }
+      }
+    } catch (e) {
+      print("Error fetching team members: $e");
+    }
+    return null;
+  }
+
+  Future<List<Team>?> getTeams({
+    required String token,
+  }) async {
+    try {
+      final url = NetworkRepository.teamsURL;
+      final response = await http.get(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'ngrok-skip-browser-warning': '69420',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        if (json['success'] == true) {
+          final data = json['data'] as List;
+          return data.map((e) {
+            final map = e as Map<String, dynamic>;
+            final membersList = map['members'] as List? ?? [];
+            final members = membersList.map((m) {
+              final memberMap = m as Map<String, dynamic>;
+              return TeamMember(
+                id: int.tryParse(memberMap['id']?.toString() ?? '0') ?? 0,
+                name: memberMap['name']?.toString() ?? '',
+                email: memberMap['email']?.toString() ?? '',
+                role: memberMap['role']?.toString() ?? '',
+              );
+            }).toList();
+
+            return Team(
+              name: map['team_name']?.toString() ?? '',
+              members: members,
+            );
+          }).toList();
+        }
+      }
+    } catch (e) {
+      print("Error fetching teams: $e");
+    }
+    return null;
+  }
+
   void clearCache() {
     _controller.add(ProjectStatus.uninitialized);
   }

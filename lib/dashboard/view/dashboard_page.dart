@@ -4,6 +4,7 @@ import 'package:sagile_mobile/dashboard/cubit/dashboard_cubit.dart';
 import 'package:sagile_mobile/calendar/view/calendar_page.dart';
 import 'package:sagile_mobile/project/view/project_page.dart';
 import 'package:sagile_mobile/home/view/settings_page.dart';
+import 'package:sagile_mobile/team/view/team_page.dart';
 import 'package:sagile_mobile/userstory/view/userstory_page.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
@@ -43,6 +44,14 @@ class DashboardPage extends StatefulWidget {
         icon: const Icon(Icons.folder),
         title: const Text("Projects"),
         selectedColor: Colors.pink,
+      ),
+    ),
+    TabPage(
+      page: const TeamPage(),
+      tab: SalomonBottomBarItem(
+        icon: const Icon(Icons.people),
+        title: const Text("Team"),
+        selectedColor: Colors.blueAccent,
       ),
     ),
     TabPage(
