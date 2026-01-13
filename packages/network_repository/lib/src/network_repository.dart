@@ -11,7 +11,7 @@ class NetworkRepository {
   const NetworkRepository();
 
   /// the main url
-  static const mainURL = 'https://noneducable-irena-helicoidally.ngrok-free.dev';
+  static const mainURL = 'https://art-instantaneous-jonie.ngrok-free.dev';
 
   /// the api url
   static const apiURL = '$mainURL/api';

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:project_repository/project_repository.dart';
 import 'package:sagile_mobile/project/bloc/project_bloc.dart';
+import '../../userstory/user_story_page.dart';
 
 class UserstoryModal extends StatefulWidget {
   const UserstoryModal({
@@ -166,6 +167,16 @@ class _UserstoryModalState extends State<UserstoryModal> {
                 _navigator.pop();
               },
               child: Text("Close"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _navigator.push(
+                  MaterialPageRoute(
+                    builder: (context) => UserStoryPage(userStoryId: widget.userstoryId),
+                  ),
+                );
+              },
+              child: const Text("View Linked NFR"),
             ),
           ],
         );

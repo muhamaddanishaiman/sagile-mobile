@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:project_repository/project_repository.dart';
 import 'package:sagile_mobile/project/bloc/project_bloc.dart';
 import 'package:sagile_mobile/burndown/burndown.dart';
+import '../../userstory/view/userstory_modal.dart';
 
 class ProjectModal extends StatefulWidget {
   const ProjectModal({
@@ -38,6 +39,39 @@ class _ProjectModalState extends State<ProjectModal> {
                 const SizedBox(height: 8),
                 Text('Start Date: ${project.startDate != null ? DateFormat('dd/MM/yyyy').format(project.startDate!) : "-"}'),
                 Text('End Date: ${project.endDate != null ? DateFormat('dd/MM/yyyy').format(project.endDate!) : "-"}'),
+                const SizedBox(height: 16),
+                const Text('User Stories', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Divider(),
+                if (project.userstories.isEmpty)
+                  const Text('No User Stories found.')
+                else
+                  Container(
+                    height: 200, // Limit height
+                    width: double.maxFinite,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: project.userstories.length,
+                      itemBuilder: (context, index) {
+                        final story = project.userstories[index];
+                        return ListTile(
+                          title: Text(story.title, style: const TextStyle(fontSize: 14)),
+                          subtitle: Text(story.status.title, style: const TextStyle(fontSize: 12)),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 12),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                          onTap: () {
+                             _navigator.pop(); // Close project modal
+                             // Open UserStory Modal
+                             showDialog(
+                               context: context,
+                               builder: (context) => UserstoryModal(
+                                 userstoryId: story.id,
+                               ),
+                             );
+                          },
+                        );
+                      },
+                    ),
+                  ),
               ],
             ),
           ),
