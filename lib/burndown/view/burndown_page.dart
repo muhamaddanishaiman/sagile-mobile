@@ -30,16 +30,30 @@ class BurndownPage extends StatelessWidget {
           rethrow;
         }
       },
-      child: _BurndownView(),
+      child: _BurndownView(projectId: projectId),
     );
   }
 }
 
 class _BurndownView extends StatelessWidget {
+  const _BurndownView({required this.projectId});
+
+  final int projectId;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Burndown Chart')),
+      appBar: AppBar(
+        title: const Text('Burndown Chart'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.read<BurndownBloc>().add(FetchBurndownData(projectId: projectId));
+            },
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
       body: BlocBuilder<BurndownBloc, BurndownState>(
         builder: (context, state) {
           if (state is BurndownLoading) {

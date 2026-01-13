@@ -57,60 +57,68 @@ class _ProjectPageState extends State<ProjectPage> {
                           return CircularProgressIndicator();
                         case ProjectStatus.ready:
                           return Expanded(
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: [
-                                ...state.projects
-                                    .map(
-                                      (e) => Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: MaterialButton(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            // Open project details
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) =>
-                                                  ProjectModal(
-                                                projectId: e.id,
+                            child: RefreshIndicator(
+                              onRefresh: () async {
+                                context.read<ProjectBloc>()
+                                  ..add(ProjectStatusChanged(ProjectStatus.loading))
+                                  ..add(ProjectStatusChanged(ProjectStatus.retrieving));
+                              },
+                              child: ListView(
+                                shrinkWrap: true,
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                children: [
+                                  ...state.projects
+                                      .map(
+                                        (e) => Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: MaterialButton(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              side: BorderSide(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
                                               ),
-                                            );
-                                          },
-                                          child: ListTile(
-                                            title: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 16.0),
-                                              child: Text(
-                                                '${e.title}',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
+                                            ),
+                                            onPressed: () {
+                                              // Open project details
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) =>
+                                                    ProjectModal(
+                                                  projectId: e.id,
+                                                ),
+                                              );
+                                            },
+                                            child: ListTile(
+                                              title: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 16.0),
+                                                child: Text(
+                                                  '${e.title}',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                               ),
+                                              subtitle: Text(
+                                                e.description.isNotEmpty 
+                                                  ? e.description 
+                                                  : "No description",
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                                             ),
-                                            subtitle: Text(
-                                              e.description.isNotEmpty 
-                                                ? e.description 
-                                                : "No description",
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                                           ),
                                         ),
-                                      ),
-                                    )
-                                    .toList(),
-                              ],
+                                      )
+                                      .toList(),
+                                ],
+                              ),
                             ),
                           );
                         case ProjectStatus.error:
