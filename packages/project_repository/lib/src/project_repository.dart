@@ -409,9 +409,14 @@ class ProjectRepository {
   Future<Map<String, dynamic>?> getBurndownData({
     required String token,
     required int projectId,
+    int? sprintId,
   }) async {
     try {
-      final url = '${NetworkRepository.projectURL}/$projectId/burndown';
+      var url = '${NetworkRepository.projectURL}/$projectId/burndown';
+      if (sprintId != null) {
+        url += '?sprint_id=$sprintId';
+      }
+      
       final response = await http.get(
         Uri.parse(url),
         headers: <String, String>{
@@ -509,6 +514,36 @@ class ProjectRepository {
       }
     } catch (e) {
       print("Error fetching teams: $e");
+    }
+    return null;
+  }
+
+  Future<List<Sprint>?> getSprints({
+    required String token,
+    required int projectId,
+  }) async {
+    try {
+      final url = '${NetworkRepository.projectURL}/$projectId/sprints';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'ngrok-skip-browser-warning': '69420',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        if (json['success'] == true) {
+          final data = json['data'] as List;
+          return data.map((e) {
+            return Sprint.fromJson(e as Map<String, dynamic>);
+          }).toList();
+        }
+      }
+    } catch (e) {
+      print("Error fetching sprints: $e");
     }
     return null;
   }

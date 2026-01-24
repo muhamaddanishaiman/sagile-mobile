@@ -23,30 +23,46 @@ class BurndownBloc extends Bloc<BurndownEvent, BurndownState> {
     FetchBurndownData event,
     Emitter<BurndownState> emit,
   ) async {
+    // Preserve sprints if available
+    List<dynamic> sprints = [];
+    if (state is BurndownLoaded) {
+      sprints = (state as BurndownLoaded).sprints;
+    }
+
     emit(BurndownLoading());
     try {
-      // We need the token. In a real app, we might get this from the AuthBloc or AuthRepository
-      // assuming AuthRepository exposes the current token.
-      // If not, we might need to rely on the passed token or similar mechanism.
-      // checking authentication_repository.dart via view_file would confirm how to get token.
-      // For now, I'll attempt to get it from the user getter if available.
-      
       final token = _authenticationRepository.token;
       
       if (token.isEmpty) {
-        emit(BurndownError("User not authenticated"));
+        emit(const BurndownError("User not authenticated"));
         return;
+      }
+
+      // Fetch sprints if not already loaded
+      if (sprints.isEmpty) {
+        final fetchedSprints = await _projectRepository.getSprints(
+          token: token,
+          projectId: event.projectId,
+        );
+        if (fetchedSprints != null) {
+          sprints = fetchedSprints;
+        }
       }
        
        final data = await _projectRepository.getBurndownData(
          token: token, 
-         projectId: event.projectId
+         projectId: event.projectId,
+         sprintId: event.sprintId,
        );
 
        if (data != null) {
-         emit(BurndownLoaded(data));
+         emit(BurndownLoaded(
+           data, 
+           sprints: sprints, 
+           selectedSprintId: event.sprintId,
+         ));
        } else {
-         emit(BurndownError("Failed to fetch data"));
+         emit(const BurndownError("Failed to fetch data"));
        }
     } catch (e) {
       emit(BurndownError(e.toString()));

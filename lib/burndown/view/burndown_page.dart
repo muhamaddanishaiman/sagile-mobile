@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:project_repository/project_repository.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:sagile_mobile/burndown/bloc/burndown_bloc.dart';
+import 'package:sagile_mobile/burndown/view/burndown_tasks_observer.dart';
 
 class BurndownPage extends StatelessWidget {
   const BurndownPage({super.key, required this.projectId});
@@ -67,11 +68,40 @@ class _BurndownView extends StatelessWidget {
             final idealData = List<double>.from((data['ideal_data'] as List).map((e) => (e as num).toDouble()));
             final actualData = List<double>.from((data['actual_data'] as List).map((e) => (e as num).toDouble()));
             
+            final sprints = state.sprints.cast<Sprint>();
+            final currentSprintId = data['sprint_id'] as int?;
+            
+            
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  Text("Sprint: ${data['sprint_name']}", style: Theme.of(context).textTheme.titleLarge),
+                  if (sprints.isNotEmpty)
+                    DropdownButton<int>(
+                      value: currentSprintId,
+                      hint: const Text("Select Sprint"),
+                      isExpanded: true,
+                      items: sprints.map((s) {
+                        return DropdownMenuItem<int>(
+                          value: s.sprintId,
+                          child: Text(
+                            "${s.sprintName} (${s.activeSprint == 1 ? 'Active' : 'Inactive'})",
+                            style: TextStyle(
+                              fontWeight: s.activeSprint == 1 ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          context.read<BurndownBloc>().add(
+                            FetchBurndownData(projectId: projectId, sprintId: val),
+                          );
+                        }
+                      },
+                    )
+                  else
+                    Text("Sprint: ${data['sprint_name']}", style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -114,6 +144,12 @@ class _BurndownView extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Expanded(
+                    child: SingleChildScrollView(
+                      child: BurndownTasksObserver(),
                     ),
                   ),
                 ],

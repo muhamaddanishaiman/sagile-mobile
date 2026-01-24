@@ -4,14 +4,16 @@ abstract class BurndownEvent extends Equatable {
   const BurndownEvent();
 
   @override
-  List<Object> get props => [];
+  @override
+  List<Object?> get props => [];
 }
 
 class FetchBurndownData extends BurndownEvent {
-  const FetchBurndownData({required this.projectId});
+  const FetchBurndownData({required this.projectId, this.sprintId});
 
   final int projectId;
+  final int? sprintId;
 
   @override
-  List<Object> get props => [projectId];
+  List<Object?> get props => [projectId, sprintId];
 }
