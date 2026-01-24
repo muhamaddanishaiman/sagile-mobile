@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sagile_mobile/burndown/bloc/burndown_bloc.dart';
 
-class BurndownTasksObserver extends StatelessWidget {
-  const BurndownTasksObserver({super.key});
+class BurndownTableView extends StatelessWidget {
+  const BurndownTableView({super.key});
 
   @override
   Widget build(BuildContext context) {
